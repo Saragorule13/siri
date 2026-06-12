@@ -1,9 +1,6 @@
-from tools import execute_tool
+from tools import open_app, open_website
 from router import decide_tool
 from llm import ask_llm
-from tools import(
-    open_chrome
-)
 
 print("Siri is listening...")
 print("Type exit to quit.\n")
@@ -16,12 +13,15 @@ while True:
         print("Siri: Goodbye!")
         break
     
-    tool = decide_tool(query)
-    if tool != "NONE":
-        result = execute_tool(tool)
+    decision = decide_tool(query)
+    if decision["tool"] == "open_application":
+        result = open_app(decision["target"])
         print(f"Siri: {result}\n")
-        continue
 
-    response = ask_llm(query)
+    elif decision["tool"] == "open_website":
+        result = open_website(decision["target"])
+        print(f"Siri: {result}\n")
 
-    print(f"{response}\n")
+    else:
+        response = ask_llm(query)
+        print(f"Siri: {response}\n")

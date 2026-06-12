@@ -1,38 +1,47 @@
 import subprocess
+import webbrowser
+import json
+from rapidfuzz import process 
 
 
-def open_chrome():
-    subprocess.Popen(
-        r"C:\Program Files\Google\Chrome\Application\chrome.exe"
-    )
-    return "Opening Chrome..."
+with open("apps.json", "r") as f:
+    APPS = json.load(f)
 
+ALIASES = {
+    "vscode": "code",
+    "vs code": "code",
+    "visual studio code": "code",
+    "chrome": "chrome",
+    "spotify": "spotify"
+}
 
-def open_vscode():
-    subprocess.Popen("code")
-    return "Opening VS Code..."
+def open_app(name):
+    try:
+        app_name = name.lower()
+        app_name = ALIASES.get(app_name, app_name)
 
+        if app_name not in APPS:
+            match = process.extractOne(
+                app_name,
+                APPS.keys()
+            )
 
-def open_calculator():
-    subprocess.Popen("calc")
-    return "Opening Calculator..."
+            if match and match[1] > 70:
+                app_name = match[0]
+            else:
+                return f"{app_name} is not installed."
 
+        subprocess.Popen(APPS[app_name])
+        return f"Opening {app_name}..."
 
-def open_notepad():
-    subprocess.Popen("notepad")
-    return "Opening Notepad..."
+    except Exception as e:
+        return f"Error opening {name}: {str(e)}"
 
-
-def execute_tool(tool_name):
-    
-    tool_map = {
-        "open_chrome": open_chrome,
-        "open_vscode": open_vscode,
-        "open_calculator": open_calculator,
-        "open_notepad": open_notepad
-    }
-
-    if tool_name in tool_map:
-        return tool_map[tool_name]()
-    else:
-        return "Tool not found."
+def open_website(url):
+    try:
+        if not url.startswith("http"):
+            url = "https://" + url
+        webbrowser.open(url)
+        return f"Opening {url}..."
+    except Exception as e:
+        return f"Error opening {url}: {str(e)}"

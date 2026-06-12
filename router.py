@@ -1,27 +1,58 @@
 from llm import ask_llm
+import json
 
-TOOL = [
-    "open_chrome",
-    "open_vscode",
-    "open_calculator",
-    "open_notepad"
+TOOLS = [
+    "open_application",
+    "open_website",
+    "open_folder"
 ]
 
 def decide_tool(prompt):
-    message = f""" 
-    You are a tool router.
+
+    message = f"""
+You are a tool router.
 
 Available tools:
-{TOOL}
+{TOOLS}
 
-Rules:
-- Return ONLY the tool name.
-- If no tool is needed, return NONE.
-- Do not explain anything.
+Return ONLY valid JSON.
 
-User request:
+Examples:
+
+User: Open Chrome
+
+{{
+    "tool": "open_application",
+    "target": "chrome"
+}}
+
+User: Open Spotify
+
+{{
+    "tool": "open_application",
+    "target": "spotify"
+}}
+
+User: Open GitHub
+
+{{
+    "tool": "open_website",
+    "target": "github.com"
+}}
+
+User: What is binary search?
+
+{{
+    "tool": "NONE"
+}}
+
+User Request:
 {prompt}
-    """
+"""
 
     response = ask_llm(message)
-    return response.strip()
+
+    try:
+        return json.loads(response)
+    except:
+        return {"tool": "NONE"}
