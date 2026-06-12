@@ -1,10 +1,12 @@
 import subprocess
 import webbrowser
 import json
+from pathlib import Path
 from rapidfuzz import process 
 
+_BASE_DIR = Path(__file__).parent
 
-with open("apps.json", "r") as f:
+with open(_BASE_DIR / "apps.json", "r") as f:
     APPS = json.load(f)
 
 ALIASES = {
